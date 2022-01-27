@@ -73,7 +73,7 @@ export default function PaginaInicial() {
                         as="form"
                         onSubmit={function (infosDoEvento) {
                             infosDoEvento.preventDefault();
-                            console.log('Alguém submeteu o form');
+                            //console.log('Alguém submeteu o form');
                             //window.location.href = '/chat';
                             roteamento.push('/chat');
                         }}
@@ -82,7 +82,7 @@ export default function PaginaInicial() {
                             width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
                         }}
                     >
-                        <Titulo tag="h2">Bem Vindo</Titulo>
+                        <Titulo tag="h2">Bem Vindo ao Aluracord</Titulo>
                         <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals[300] }}>
                             {appConfig.name}
                         </Text>
@@ -96,6 +96,7 @@ export default function PaginaInicial() {
                                 const valor = event.target.value;
                                 // Trocar o valor da variável através do React
                                 setUsername(valor);
+                                
                             }}
                             fullWidth
                             textFieldColors={{

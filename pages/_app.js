@@ -23,12 +23,26 @@ function GlobalStyle() {
                 flex: 1;
             }
             /* ./App fit Height*/
+
+            ::-webkit-scrollbar {
+                width: 0.5em;
+              }
+              
+              /* Track */
+              ::-webkit-scrollbar-track {
+                background: #313D49;
+              }
+              
+              /* Handle */
+              ::-webkit-scrollbar-thumb {
+                background: #F79596;
+              }
         `}</style>
     );
 }
 
 export default function CustomApp({ Component, pageProps }) {
-    console.log('Roda em todas as páginas');
+    //console.log('Roda em todas as páginas');
     return  (
     <>
     <GlobalStyle/>
@@ -36,3 +50,4 @@ export default function CustomApp({ Component, pageProps }) {
     </>
     );
 }
+
