@@ -1,16 +1,44 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import React from 'react';
 import appConfig from '../config.json';
+import { createClient } from '@supabase/supabase-js'
+
+
+// Como fazer AJAX: https://medium.com/@omariosouto/entendendo-como-fazer-ajax-com-a-fetchapi-977ff20da3c6
+
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzM3NjU4MSwiZXhwIjoxOTU4OTUyNTgxfQ.M1zjwpCCUYwKvov8gAuHc40DEMu-pOnHjmqlpAZmFfE'
+const SUPABASE_URL = 'https://huqaqwlenvyfixexqtsv.supabase.co'
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 
 export default function ChatPage() {
     const [mensagem, setMensagem] = React.useState('');
     const [listaDeMensagem, setListaDeMensagem] = React.useState([]);
+
+   React.useEffect(() => {
+        supabaseClient
+            .from('Mensagens')
+            .select('*')
+            .order('id', {ascending: false})
+            .then(({data}) => {
+                console.log('Dados da consulta:', data);
+                setListaDeMensagem(data);
+            });
+    }, []);
+   
+    
     /* Sua lógica vai aqui
 
     //Usuário:
     - Usuário digita no campo textarea
     - Aperta Enter para enviar
     - Adicionar o texto na listagem
+
+    fetch('https://api.github.com/users/rafatuba')
+    .then(async (respostaDoServidor) => {
+        const respostaEsperada = await respostaDoServidor.json();
+        console.log(respostaEsperada);
+    })
 
     // DEV:
     - [x] Campo criado
@@ -19,17 +47,29 @@ export default function ChatPage() {
     */
     function handleNovaMensagem(novaMensagem) {
         const mensagem = {
-            id: listaDeMensagem.length,
+            //id: listaDeMensagem.length,
             de: 'Rafatuba',
             texto: novaMensagem,
         };
-        setListaDeMensagem([
-            mensagem,
-            ...listaDeMensagem,
-            
-        ]);
+
+    
+
+        supabaseClient
+            .from('Mensagens')
+            .insert([
+                mensagem 
+            ])
+            .then(({data}) => {
+                //console.log('Criando mensagem:', data)
+                setListaDeMensagem([
+                    data[0],
+                    ...listaDeMensagem,            
+                ]);
+            });
+
         setMensagem('');
     }
+
     return (
         <Box
             styleSheet={{
@@ -109,6 +149,7 @@ export default function ChatPage() {
                                 color: appConfig.theme.colors.neutrals[200],
                             }}
                         />
+                        
                     </Box>
                 </Box>
             </Box>
@@ -176,7 +217,7 @@ function MessageList(props) {
                                     display: 'inline-block',
                                     marginRight: '8px',
                                 }}
-                                src={`https://github.com/rafatuba.png`}
+                                src={`https://github.com/${mensagem.de}.png`}
                             />
                             <Text tag="strong">
                                 {mensagem.de}
