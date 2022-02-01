@@ -1,7 +1,9 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import React from 'react';
 import appConfig from '../config.json';
+import { useRouter } from 'next/router';
 import { createClient } from '@supabase/supabase-js'
+import { ButtonSendSticker } from '../src/components/ButtonSendSticker';
 
 
 // Como fazer AJAX: https://medium.com/@omariosouto/entendendo-como-fazer-ajax-com-a-fetchapi-977ff20da3c6
@@ -10,10 +12,29 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5v
 const SUPABASE_URL = 'https://huqaqwlenvyfixexqtsv.supabase.co'
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+function escutaMensagensEmTempoReal(adicionaMensagem) {
+    return supabaseClient
+    .from('Mensagens')
+    .on('INSERT', (respostaLive) => {
+        adicionaMensagem(respostaLive.new);
+    })
+    .subscribe();
+}
+
 
 export default function ChatPage() {
+    const roteamento = useRouter();
+    const usuarioLogado = roteamento.query.username;
+    console.log('usuarioLogado', usuarioLogado);
+    console.log('roteamento.query',roteamento.query);
     const [mensagem, setMensagem] = React.useState('');
-    const [listaDeMensagem, setListaDeMensagem] = React.useState([]);
+    const [listaDeMensagem, setListaDeMensagem] = React.useState([
+       /* {
+            id: 1,
+            de: 'rafatuba',
+            texto: ':sticker: https://www.alura.com.br/imersao-react-4/assets/figurinhas/Figurinha_1.png',
+        } */
+    ]);
 
    React.useEffect(() => {
         supabaseClient
@@ -23,6 +44,18 @@ export default function ChatPage() {
             .then(({data}) => {
                 console.log('Dados da consulta:', data);
                 setListaDeMensagem(data);
+            });
+
+            escutaMensagensEmTempoReal((novaMensagem) => {
+                console.log('Nova mensagem', novaMensagem);
+                //quero reusar um valor de referência (objeto/array)
+                // passar uma função pro setState
+                setListaDeMensagem((valorAtualDaLista) => {
+                    return [
+                        novaMensagem,
+                        ...valorAtualDaLista,            
+              ]
+                });
             });
     }, []);
    
@@ -48,7 +81,7 @@ export default function ChatPage() {
     function handleNovaMensagem(novaMensagem) {
         const mensagem = {
             //id: listaDeMensagem.length,
-            de: 'Rafatuba',
+            de: usuarioLogado,
             texto: novaMensagem,
         };
 
@@ -61,12 +94,9 @@ export default function ChatPage() {
             ])
             .then(({data}) => {
                 //console.log('Criando mensagem:', data)
-                setListaDeMensagem([
-                    data[0],
-                    ...listaDeMensagem,            
-                ]);
+        /*         */
             });
-
+    
         setMensagem('');
     }
 
@@ -148,6 +178,13 @@ export default function ChatPage() {
                                 marginRight: '12px',
                                 color: appConfig.theme.colors.neutrals[200],
                             }}
+                        />
+                        {/* CallBack */}
+                        < ButtonSendSticker
+                        onStickerClick={(sticker) => {
+                            //console.log('[USANDO O COMPONENTE] salva esse sticker no banco', sticker);
+                            handleNovaMensagem(':sticker: ' + sticker);
+                        }}
                         />
                         
                     </Box>
@@ -233,8 +270,15 @@ function MessageList(props) {
                                 {(new Date().toLocaleDateString())}
                             </Text>
                         </Box>
-                        {mensagem.texto}
-                    </Text>
+                        {mensagem.texto.startsWith(':sticker:')
+                            ? (
+                                <Image src={mensagem.texto.replace(':sticker:', '')} />
+                            )
+                            : (
+                                mensagem.texto
+                            )}
+                    {/*    {mensagem.texto} */}
+                </Text>
                 )
             })}
 

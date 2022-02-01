@@ -36,7 +36,7 @@ function HomePage() {
 
 export default function PaginaInicial() {
     //const username = 'Rafatuba';
-    const [username, setUsername] = React.useState('Rafatuba');
+    const [username, setUsername] = React.useState('');
     //console.log('stateDoReact', stateDoReact);
     const roteamento = useRouter();
     //console.log(roteamento);
@@ -73,14 +73,14 @@ export default function PaginaInicial() {
                             infosDoEvento.preventDefault();
                             //console.log('Alguém submeteu o form');
                             //window.location.href = '/chat';
-                            roteamento.push('/chat');
+                            roteamento.push(`/chat?username=${username}`);
                         }}
                         styleSheet={{
                             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                             width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
                         }}
                     >
-                        <Titulo tag="h2">Bem Vindo ao Aluracord</Titulo>
+                        <Titulo tag="h2">Bem Vindo ao Meu Chat</Titulo>
                         <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals[300] }}>
                             {appConfig.name}
                         </Text>
